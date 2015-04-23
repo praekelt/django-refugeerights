@@ -34,7 +34,6 @@ class Metric_Sender(Task):
             conversation_key=settings.VUMI_GO_CONVERSATION_KEY,
             conversation_token=settings.VUMI_GO_ACCOUNT_TOKEN
         )
-        # return LoggingSender('go_http.test')
 
     def run(self, metric, value, agg, **kwargs):
         """
