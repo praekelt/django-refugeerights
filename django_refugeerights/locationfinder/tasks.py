@@ -77,7 +77,8 @@ class Location_Finder(Task):
         add_output = ', '.join(
             match.data[key] for key in additional
             if key in match.data and match.data[key] != "")
-        return "%s (%s)" % (match.data[primary], add_output)
+        formatted = "%s (%s)" % (match.data[primary], add_output)
+        return (match.id, formatted)
 
     def run(self, lookuppointofinterest_id, **kwargs):
         """
@@ -104,11 +105,13 @@ class Location_Finder(Task):
             submission = matches[:settings.LOCATION_MAX_RESPONSES]
             total = len(submission)
             if total != 0:
-                output = ' AND '.join(self.format_match(match)
-                                      for match in submission)
+                formatted = [self.format_match(match) for match in submission]
+                output = ' AND '.join(match[1] for match in formatted)
             else:
                 output = ""
+                formatted = []
             lookuppoi.response["results"] = output
+            lookuppoi.response["results_detailed"] = formatted
             lookuppoi.save()
             l.info("Completed location search. Found: %s" % str(total))
             return True
