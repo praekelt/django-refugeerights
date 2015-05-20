@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'django_hstore',
     # us
     'locationfinder',
+    'metricsdownloader',
 
 )
 
