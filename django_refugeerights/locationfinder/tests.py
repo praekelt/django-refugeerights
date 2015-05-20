@@ -423,8 +423,10 @@ class TestLocationFinderDistanceSorting(AuthenticatedAPITestCase):
 
         d = LookupPointOfInterest.objects.last()
         self.assertEqual(d.response["results"],
-                         "Clinic One (Tel One) "
-                         "AND Clinic Two (Tel Two)")
+                         "Clinic One (Tel One) AND Clinic Two (Tel Two)")
+        self.assertEqual(
+            d.response["results_detailed"],
+            ('[[1, "Clinic One (Tel One)"], [2, "Clinic Two (Tel Two)"]]'))
 
     def test_create_reverse_result(self):
         # 4 valid clinics, shows two
