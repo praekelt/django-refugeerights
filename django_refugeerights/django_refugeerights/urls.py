@@ -11,4 +11,6 @@ urlpatterns = patterns('',
                            'locationfinder.views.locations_uploader',
                            {'page_name': 'locations_uploader'},
                            name="locations_uploader"),
+                       url(r'^contentstore/',
+                           include('contentstore.urls')),
                        )

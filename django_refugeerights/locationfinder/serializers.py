@@ -24,6 +24,12 @@ class PointOfInterestSerializer(HyperlinkedModelSerializer):
         model = PointOfInterest
         fields = ('url', 'id', 'data', 'location')
 
+    def create(self, validated_data):
+        location_data = validated_data.pop('location')
+        loc = Location.objects.create(**location_data)
+        poi = PointOfInterest.objects.create(location=loc, **validated_data)
+        return poi
+
 
 class LookupLocationSerializer(GeoModelSerializer):
 
@@ -45,3 +51,10 @@ class LookupPointOfInterestSerializer(HyperlinkedModelSerializer):
         model = LookupPointOfInterest
         fields = (
             'url', 'search', 'response', 'location')
+
+    def create(self, validated_data):
+        location_data = validated_data.pop('location')
+        lloc = LookupLocation.objects.create(**location_data)
+        lpoi = LookupPointOfInterest.objects.create(location=lloc,
+                                                    **validated_data)
+        return lpoi
