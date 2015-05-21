@@ -1,0 +1,45 @@
+[
+{
+    "fields": {
+        "lookup_name": "stores.refugeerights_qa.total.ussd.sessions.transient.sum",
+        "display_name": "Total Ussd Sessions - Sum",
+        "created_at": "2015-01-14T13:02:12.521Z",
+        "updated_at": "2015-01-14T13:02:12.521Z"
+    },
+    "model": "metricsdownloader.metric",
+    "pk": 1
+},
+{
+    "fields": {
+        "lookup_name": "stores.refugeerights_qa.total.ussd.sessions.last",
+        "display_name": "Total Ussd Sessions - Last",
+        "created_at": "2015-01-14T13:02:12.521Z",
+        "updated_at": "2015-01-14T13:02:12.521Z"
+    },
+    "model": "metricsdownloader.metric",
+    "pk": 2
+},
+
+{
+    "fields": {
+        "metric": 1,
+        "date_recorded": "2015-01-30T00:00:00.000Z",
+        "value": 20,
+        "created_at": "2015-01-30T13:02:12.521Z",
+        "updated_at": "2015-01-30T13:02:12.521Z"
+    },
+    "model": "metricsdownloader.metricrecord",
+    "pk": 1
+},
+{
+    "fields": {
+        "metric": 2,
+        "date_recorded": "2015-01-30T00:00:00.000Z",
+        "value": 17,
+        "created_at": "2015-01-30T13:02:12.521Z",
+        "updated_at": "2015-01-30T13:02:12.521Z"
+    },
+    "model": "metricsdownloader.metricrecord",
+    "pk": 2
+}
+]
