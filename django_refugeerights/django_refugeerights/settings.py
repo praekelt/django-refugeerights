@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     # us
     'locationfinder',
     'metricsdownloader',
+    'subscription',
 
 )
 

@@ -88,7 +88,7 @@ class TestLocationFinderDataStorage(AuthenticatedAPITestCase):
 
     def test_login(self):
         request = self.client.post(
-            '/locationfinder/api-token-auth/',
+            '/api-token-auth/',
             {"username": "testuser", "password": "testpass"})
         token = request.data.get('token', None)
         self.assertIsNotNone(
