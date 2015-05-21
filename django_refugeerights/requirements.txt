@@ -13,4 +13,4 @@ celery
 django-celery==3.1.16
 redis
 go-http==0.2.2
-git+ssh://git@github.com/praekelt/django-messaging-contentstore.git
+git+https://github.com/praekelt/django-messaging-contentstore.git
