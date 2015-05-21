@@ -19,9 +19,12 @@ def record_all_metrics():
     Task to record all metricstore values at a point in time
     """
     metrics = Metric.objects.all()
+    num_metrics = 0
 
     for metric in metrics:
+        num_metrics += 1
         fetch_metric.delay(metric)
+    return "Recorded values for %d metrics" % num_metrics
 
 
 @task()
@@ -39,6 +42,7 @@ def fetch_metric(metric):
     date_fetched = get_date()
 
     record_metric.delay(metric, date_fetched, metric_value)
+    return "Fetched metric value for %s" % metric.display_name
 
 
 @task()
@@ -46,5 +50,7 @@ def record_metric(metric, date_fetched, metric_value):
     """
     Records a metric at a point in time
     """
-    MetricRecord.objects.create(metric=metric, date_recorded=date_fetched,
-                                value=metric_value)
+    new_metric = MetricRecord.objects.create(metric=metric,
+                                             date_recorded=date_fetched,
+                                             value=metric_value)
+    return "Created new metric record <%s>" % new_metric.id
