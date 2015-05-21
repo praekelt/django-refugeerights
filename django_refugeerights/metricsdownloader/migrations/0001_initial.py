@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('lookup_name', models.CharField(max_length=255)),
-                ('display_name', models.CharField(max_length=25)),
+                ('display_name', models.CharField(max_length=50)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
             ],
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('value', models.IntegerField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('metric', models.ForeignKey(related_name='metric', to='metricsdownloader.Metric')),
+                ('metric', models.ForeignKey(related_name='records', to='metricsdownloader.Metric')),
             ],
         ),
     ]

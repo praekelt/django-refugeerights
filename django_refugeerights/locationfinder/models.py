@@ -22,7 +22,7 @@ class Location(gismodels.Model):
     objects = gismodels.GeoManager()
 
     def __unicode__(self):
-        return "%s" % (self.point)
+        return u"%s" % (self.point)
 
 
 class PointOfInterest(HStoreModel):
@@ -39,11 +39,11 @@ class PointOfInterest(HStoreModel):
     def __unicode__(self):
         # This will only work while the data is well structured
         if "Location Name" in self.data:
-            return "%s at %s, %s" % (self.data["Location Name"],
-                                     self.location.point.x,
-                                     self.location.point.y)
+            return u"%s at %s, %s" % (self.data["Location Name"],
+                                      self.location.point.x,
+                                      self.location.point.y)
         else:
-            return "Point of Interest at %s, %s" % \
+            return u"Point of Interest at %s, %s" % \
                 (self.location.point.x, self.location.point.y)
 
 
@@ -62,7 +62,7 @@ class LookupLocation(gismodels.Model):
     objects = gismodels.GeoManager()
 
     def __unicode__(self):
-        return "%s" % (self.point)
+        return u"%s" % (self.point)
 
 
 class LookupPointOfInterest(HStoreModel):
@@ -82,14 +82,14 @@ class LookupPointOfInterest(HStoreModel):
     def __unicode__(self):
         # This will only work while the data is well structured
         if "to_addr" in self.response and self.location is not None:
-            return "%s at %s, %s" % (self.response["to_addr"],
-                                     self.location.point.x,
-                                     self.location.point.y)
+            return u"%s at %s, %s" % (self.response["to_addr"],
+                                      self.location.point.x,
+                                      self.location.point.y)
         elif self.location is not None:
-            return "Lookup at %s, %s" % (self.location.point.x,
-                                         self.location.point.y)
+            return u"Lookup at %s, %s" % (self.location.point.x,
+                                          self.location.point.y)
         else:
-            return "Lookup timed at %s" % (self.created_at)
+            return u"Lookup timed at %s" % (self.created_at)
 
 # Tasks import models from this file so must go here
 from .tasks import location_finder
