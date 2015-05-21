@@ -6,10 +6,28 @@ from go_http.metrics import MetricsApiClient
 from .models import Metric, MetricRecord
 
 
-@task
-def record_metric(metric):
+def get_date():
+    today = datetime.today()
+    # use the same time for all metrics
+    date = datetime(today.year, today.month, today.day)
+    return date
+
+
+@task()
+def record_all_metrics():
     """
-    Records a metric from the metricstore at a point in time
+    Task to record all metricstore values at a point in time
+    """
+    metrics = Metric.objects.all()
+
+    for metric in metrics:
+        fetch_metric.delay(metric)
+
+
+@task()
+def fetch_metric(metric):
+    """
+    Task to look up a metric value from the metricstore
     """
     metric_client = MetricsApiClient(settings.METRIC_API_KEY)
     response = metric_client.get_metric(
@@ -17,19 +35,15 @@ def record_metric(metric):
         "-" + settings.METRIC_RECORDING_INTERVAL,
         settings.METRIC_RECORDING_INTERVAL,
         "")
-    metric_value = int(float(response.values()[0][-1]['y']))
-    today = datetime.today()
-    # use the same time for all metrics
-    date_recorded = datetime(today.year, today.month, today.day)
-    MetricRecord.objects.create(metric, date_recorded, metric_value)
+    metric_value = float(response.values()[0][-1]['y'])
+    date_fetched = get_date()
+
+    record_metric.delay(metric, date_fetched, metric_value)
 
 
 @task()
-def record_metrics():
+def record_metric(metric, date_fetched, metric_value):
     """
-    Task to record all metricstore values at a point in time
+    Records a metric at a point in time
     """
-    metrics = Metric.objects.all()
-
-    for metric in metrics:
-        record_metric(metric)
+    MetricRecord.objects.create(metric, date_fetched, metric_value)

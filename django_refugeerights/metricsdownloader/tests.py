@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from .models import Metric, MetricRecord
-from .tasks import record_metrics
+from .tasks import record_metric, get_date
 
 
 class MetricsRecordingTest(TestCase):
@@ -17,10 +17,6 @@ class MetricsRecordingTest(TestCase):
         self.user = User.objects.create_user(self.username,
                                              'testuser@example.com',
                                              self.password)
-        # self.api_key = self.user.api_key.key
-
-    # def get_credentials(self):
-    #     return self.create_apikey(self.username, self.api_key)
 
     def test_data_loaded(self):
         users = User.objects.all()
@@ -31,7 +27,11 @@ class MetricsRecordingTest(TestCase):
         self.assertEqual(metricrecords.count(), 2)
 
     def test_record_metrics(self):
-        record_metrics.delay()
+        metric = Metric.objects.all()[0]
+        date_fetched = get_date()
+        metric_value = 55.7
+
+        record_metric.delay(metric, date_fetched, metric_value)
 
         users = User.objects.all()
         self.assertEqual(users.count(), 1)
@@ -39,91 +39,3 @@ class MetricsRecordingTest(TestCase):
         self.assertEqual(metrics.count(), 2)
         metricrecords = MetricRecord.objects.all()
         self.assertEqual(metricrecords.count(), 4)
-
-
-    # def test_get_list_unauthorzied(self):
-    #     self.assertHttpUnauthorized(
-    #         self.api_client.get(
-    #             '/api/v1/servicerating/useraccount/',
-    #             format='json'))
-
-    # def test_api_keys_created(self):
-    #     self.assertEqual(True, self.api_key is not None)
-
-    # def test_get_useraccount_list_json(self):
-    #     resp = self.api_client.get(
-    #         '/api/v1/servicerating/useraccount/', format='json',
-    #         authentication=self.get_credentials())
-    #     self.assertValidJSONResponse(resp)
-
-    #     # Scope out the data for correctness.
-    #     self.assertEqual(len(self.deserialize(resp)['objects']), 1)
-
-    # def test_get_useraccount_filtered_list_json(self):
-    #     filter_data = {
-    #         "key": "useraccountkey"
-    #     }
-
-    #     resp = self.api_client.get(
-    #         '/api/v1/servicerating/useraccount/',
-    #         data=filter_data, format='json',
-    #         authentication=self.get_credentials())
-    #     self.assertValidJSONResponse(resp)
-
-    #     # Scope out the data for correctness.
-    #     self.assertEqual(len(self.deserialize(resp)['objects']), 1)
-
-    # def test_get_useraccount_filtered_list_denied_json(self):
-    #     filter_data = {
-    #         "name": "useraccountkey"
-    #     }
-
-    #     resp = self.api_client.get(
-    #         '/api/v1/servicerating/useraccount/', data=filter_data,
-    #         format='json', authentication=self.get_credentials())
-    #     json_item = json.loads(resp.content)
-    #     self.assertHttpBadRequest(resp)
-    #     self.assertEqual(
-    #         "The 'name' field does not allow filtering.", json_item["error"])
-
-    # def test_post_good_json(self):
-    #     data = {
-    #         "user_account": "useraccountkey",
-    #         "conversation_key": "dummyconversation",
-    #         "contact": {
-    #             "extra": {
-    #                 "clinic_code": "123458",
-    #                 "suspect_pregnancy": "yes",
-    #                 "id_type": "none",
-    #                 "ussd_sessions": "5",
-    #                 "last_stage": "states_language",
-    #                 "language_choice": "en",
-    #                 "is_registered": "true",
-    #                 "metric_sessions_to_register": "5"
-    #             },
-    #             "groups": [],
-    #             "subscription": {},
-    #             "msisdn": "+27001",
-    #             "created_at": "2014-06-25 15:37:57.957",
-    #             "user_account": "useraccountkey",
-    #             "key": "dummycontactkeyexternal",
-    #             "name": None,
-    #             "surname": None,
-    #             "email_address": None,
-    #             "dob": None,
-    #             "twitter_handle": None,
-    #             "facebook_id": None,
-    #             "bbm_pin": None,
-    #             "gtalk_id": None
-    #         },
-    #         "answers": {
-    #             "key1": "value1",
-    #             "key2": "value2",
-    #             "key3": "value3"
-    #         }
-    #     }
-
-    #     self.assertHttpCreated(
-    #         self.api_client.post('/api/v1/servicerating/rate/', format='json',
-    #                              authentication=self.get_credentials(),
-    #                              data=data))
