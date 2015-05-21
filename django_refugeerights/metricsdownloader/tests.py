@@ -3,6 +3,8 @@ from django.test import TestCase
 from .models import Metric, MetricRecord
 from .tasks import record_metric, get_date
 
+from datetime import datetime
+
 
 class MetricsRecordingTest(TestCase):
 
@@ -33,9 +35,7 @@ class MetricsRecordingTest(TestCase):
 
         record_metric.delay(metric, date_fetched, metric_value)
 
-        users = User.objects.all()
-        self.assertEqual(users.count(), 1)
-        metrics = Metric.objects.all()
-        self.assertEqual(metrics.count(), 2)
         metricrecords = MetricRecord.objects.all()
-        self.assertEqual(metricrecords.count(), 4)
+        self.assertEqual(metricrecords.count(), 3)
+        added_metricrecord = MetricRecord.objects.all()[2]
+        self.assertEqual(added_metricrecord.value, 55.7)

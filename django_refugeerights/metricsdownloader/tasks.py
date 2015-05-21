@@ -46,4 +46,5 @@ def record_metric(metric, date_fetched, metric_value):
     """
     Records a metric at a point in time
     """
-    MetricRecord.objects.create(metric, date_fetched, metric_value)
+    MetricRecord.objects.create(metric=metric, date_recorded=date_fetched,
+                                value=metric_value)
