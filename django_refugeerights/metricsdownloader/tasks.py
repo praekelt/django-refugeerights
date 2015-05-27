@@ -38,11 +38,14 @@ def fetch_metric(metric):
         "-" + settings.METRIC_RECORDING_INTERVAL,
         settings.METRIC_RECORDING_INTERVAL,
         "")
-    metric_value = float(response.values()[0][-1]['y'])
-    date_fetched = get_date()
 
-    record_metric.delay(metric, date_fetched, metric_value)
-    return "Fetched metric value for %s" % metric.display_name
+    if len(response) > 0:
+        metric_value = float(response.values()[0][-1]['y'])
+        date_fetched = get_date()
+        record_metric.delay(metric, date_fetched, metric_value)
+        return "Fetched metric value for %s" % metric.display_name
+    else:
+        return "No values found for metric %s" % metric.display_name
 
 
 @task()
