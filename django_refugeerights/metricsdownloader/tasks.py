@@ -1,5 +1,6 @@
 # metric = "stores.refugeerights_qa.total.ussd.sessions.transient.sum"
 from datetime import datetime
+from pytz import utc
 from celery import task
 from django.conf import settings
 from go_http.metrics import MetricsApiClient
@@ -7,9 +8,9 @@ from .models import Metric, MetricRecord
 
 
 def get_date():
-    today = datetime.today()
+    now = datetime.now(utc)
     # use the same time for all metrics
-    date = datetime(today.year, today.month, today.day)
+    date = now.replace(hour=0, minute=0, second=0, microsecond=0)
     return date
 
 
