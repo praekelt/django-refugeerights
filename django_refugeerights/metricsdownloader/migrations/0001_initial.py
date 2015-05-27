@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('date_recorded', models.DateTimeField()),
-                ('value', models.FloatField()),
+                ('value', models.IntegerField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('metric', models.ForeignKey(related_name='records', to='metricsdownloader.Metric')),
