@@ -1,0 +1,192 @@
+[
+{
+    "pk": 1,
+    "model": "djcelery.crontabschedule",
+    "fields": {
+        "month_of_year": "*",
+        "day_of_week": "*",
+        "hour": "7",
+        "minute": "0",
+        "day_of_month": "*"
+    }
+},
+{
+    "pk": 2,
+    "model": "djcelery.crontabschedule",
+    "fields": {
+        "month_of_year": "*",
+        "day_of_week": "1",
+        "hour": "8",
+        "minute": "0",
+        "day_of_month": "*"
+    }
+},
+{
+    "pk": 1,
+    "model": "djcelery.periodictask",
+    "fields": {
+        "task": "subscription.tasks.process_message_queue",
+        "name": "Daily - 9am",
+        "exchange": null,
+        "last_run_at": null,
+        "args": "[]",
+        "enabled": true,
+        "routing_key": null,
+        "crontab": 1,
+        "interval": null,
+        "queue": null,
+        "total_run_count": 0,
+        "expires": null,
+        "kwargs": "{\"schedule\":1}",
+        "date_changed": "2014-07-04T08:54:47.683Z",
+        "description": ""
+    }
+},
+{
+    "pk": 2,
+    "model": "djcelery.periodictask",
+    "fields": {
+        "task": "subscription.tasks.process_message_queue",
+        "name": "Monday - 10am",
+        "exchange": null,
+        "last_run_at": null,
+        "args": "[]",
+        "enabled": true,
+        "routing_key": null,
+        "crontab": 2,
+        "interval": null,
+        "queue": null,
+        "total_run_count": 0,
+        "expires": null,
+        "kwargs": "{\"schedule\":2}",
+        "date_changed": "2014-07-04T08:54:47.683Z",
+        "description": ""
+    }
+},
+{
+    "pk": 1,
+    "model": "contentstore.schedule",
+    "fields": {
+        "month_of_year": "*",
+        "day_of_week": "*",
+        "hour": "7",
+        "minute": "0",
+        "day_of_month": "*"
+    }
+},
+{
+    "pk": 2,
+    "model": "contentstore.schedule",
+    "fields": {
+        "month_of_year": "*",
+        "day_of_week": "1",
+        "hour": "8",
+        "minute": "0",
+        "day_of_month": "*"
+    }
+},
+{
+    "pk": 1,
+    "model": "contentstore.messageset",
+    "fields": {
+        "created_at": "2014-07-01T10:49:23.571Z",
+        "notes": "First Message Set",
+        "next_set": 2,
+        "short_name": "first",
+        "default_schedule": 1,
+        "updated_at": "2014-07-01T10:49:23.572Z"
+    }
+},
+{
+    "pk": 2,
+    "model": "contentstore.messageset",
+    "fields": {
+        "created_at": "2014-07-01T10:49:23.571Z",
+        "notes": "Second Message Set",
+        "next_set": null,
+        "short_name": "second",
+        "default_schedule": 2,
+        "updated_at": "2014-07-01T10:49:23.572Z"
+    }
+},
+{
+    "pk": 1,
+    "model": "contentstore.message",
+    "fields": {
+        "lang": "en",
+        "created_at": "2014-07-23T21:14:45.374Z",
+        "updated_at": "2014-07-23T21:14:45.374Z",
+        "text_content": "Message 1 on first",
+        "messageset": 1,
+        "sequence_number": 1
+    }
+},
+{
+    "pk": 2,
+    "model": "contentstore.message",
+    "fields": {
+        "lang": "en",
+        "created_at": "2014-07-23T21:14:45.374Z",
+        "updated_at": "2014-07-23T21:14:45.374Z",
+        "text_content": "Message 2 on first",
+        "messageset": 1,
+        "sequence_number": 2
+    }
+},
+{
+    "pk": 3,
+    "model": "contentstore.message",
+    "fields": {
+        "lang": "en",
+        "created_at": "2014-07-23T21:14:45.374Z",
+        "updated_at": "2014-07-23T21:14:45.374Z",
+        "text_content": "Message 1 on second",
+        "messageset": 2,
+        "sequence_number": 1
+    }
+},
+{
+    "pk": 4,
+    "model": "contentstore.message",
+    "fields": {
+        "lang": "en",
+        "created_at": "2014-07-23T21:14:45.374Z",
+        "updated_at": "2014-07-23T21:14:45.374Z",
+        "text_content": "Message 2 on second",
+        "messageset": 2,
+        "sequence_number": 2
+    }
+},
+{
+    "pk": 1,
+    "model": "subscription.subscription",
+    "fields": {
+        "lang": "en",
+        "schedule": 1,
+        "completed": false,
+        "to_addr": "+271234",
+        "updated_at": "2014-07-23T13:40:57.601Z",
+        "messageset_id": 1,
+        "next_sequence_number": 1,
+        "active": true,
+        "contact_key": "82309423098",
+        "created_at": "2014-07-23T13:40:57.601Z"
+    }
+},
+{
+    "pk": 2,
+    "model": "subscription.subscription",
+    "fields": {
+        "lang": "en",
+        "schedule": 1,
+        "completed": false,
+        "to_addr": "+271234",
+        "updated_at": "2014-07-23T13:40:57.601Z",
+        "messageset_id": 2,
+        "next_sequence_number": 2,
+        "active": true,
+        "contact_key": "82309423098",
+        "created_at": "2014-07-23T13:40:57.601Z"
+    }
+}
+]
