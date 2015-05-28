@@ -23,4 +23,4 @@ class Subscription(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return u"%s" % self.short_name
+        return u"%s to message set %d" % (self.contact_key, self.messageset_id)
