@@ -14,7 +14,7 @@ class Metric(models.Model):
 class MetricRecord(models.Model):
     metric = models.ForeignKey(Metric, related_name='records', null=False)
     date_recorded = models.DateTimeField(null=False, blank=False)
-    value = models.IntegerField(null=False, blank=False)
+    value = models.FloatField(null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
