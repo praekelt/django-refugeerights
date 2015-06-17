@@ -37,8 +37,9 @@ class SnappyFaqSyncTest(TestCase):
                       json.dumps(snappy_response),
                       status=200, content_type='application/json')
 
-        sync_result = sync_faqs()
+        sync_result = sync_faqs.delay()
 
         faqs = SnappyFaq.objects.all()
         self.assertEqual(len(faqs), 2)
-        self.assertEqual(sync_result, "")
+        self.assertEqual(sync_result.get(),
+                         "FAQs synced. Created FAQs: Refugee FAQ 2222\n")

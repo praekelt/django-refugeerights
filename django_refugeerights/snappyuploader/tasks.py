@@ -9,14 +9,13 @@ def snappy_request(method, endpoint):
     Function that makes the Snappy Api requests.
     """
     api_url = "%s/%s" % (settings.SNAPPY_BASE_URL, endpoint)
-    auth = {'username': settings.SNAPPY_API_KEY,
-            'password': 'x'}
+    auth = (settings.SNAPPY_API_KEY, 'x')
     headers = {'content-type': 'application/json; charset=utf-8'}
 
     if method == "GET":
         response = requests.get(api_url, auth=auth, headers=headers)
 
-    return response
+    return response.json()
 
 
 @task()
@@ -33,8 +32,9 @@ def sync_faqs():
     # Check if the FAQs exist and create entries in DB if not
     created_faqs = ""
     for faq in response:
-        obj, created = SnappyFaq.objects.get_or_create(snappy_id=faq.id,
-                                                       name=faq.title)
+        obj, created = SnappyFaq.objects.get_or_create(
+            snappy_id=int(faq["id"]),
+            name=faq["title"])
         if created:
             created_faqs += obj.name + "\n"
 
