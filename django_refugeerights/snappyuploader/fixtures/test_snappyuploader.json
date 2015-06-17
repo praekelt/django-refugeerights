@@ -1,0 +1,11 @@
+[
+    {
+        "fields": {
+            "point": "POINT (17.9145812988280007 -32.7461242675779971)",
+            "created_at": "2015-01-14T13:00:42.246Z",
+            "updated_at": "2015-01-14T13:00:42.246Z"
+        },
+        "model": "snappyuploader.snappyfaq",
+        "pk": 1
+    }
+]
