@@ -1,0 +1,12 @@
+[
+    {
+        "fields": {
+            "snappy_id": "1",
+            "name": "Test FAQ",
+            "created_at": "2015-01-14T13:00:42.246Z",
+            "updated_at": "2015-01-14T13:00:42.246Z"
+        },
+        "model": "snappyuploader.snappyfaq",
+        "pk": 1
+    }
+]

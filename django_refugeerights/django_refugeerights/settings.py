@@ -170,6 +170,13 @@ LOCATION_SEARCH_RADIUS = 10  # KM
 METRIC_API_KEY = ""
 METRIC_RECORDING_INTERVAL = "30d"
 
+SNAPPY_BASE_URL = "https://app.besnappy.com/api/v1"
+SNAPPY_ACCOUNT_ID = 12345
+SNAPPY_API_KEY = "replaceme"
+SNAPPY_MAILBOX_ID = 1
+SNAPPY_EMAIL = "replaceme@example.org"
+SNAPPY_EXTRAS = []
+
 
 try:
     from local_settings import *   # flake8: noqa
