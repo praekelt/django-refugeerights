@@ -3,7 +3,7 @@ from django.test.utils import override_settings
 import responses
 import json
 from .models import SnappyFaq
-from .tasks import sync_faqs
+from .tasks import sync_faqs, csv_importer
 
 
 class SnappyFaqSyncTest(TestCase):
@@ -78,3 +78,51 @@ class SnappyFaqSyncTest(TestCase):
         faqs = SnappyFaq.objects.all()
         self.assertEqual(len(faqs), 1)
         self.assertEqual(sync_result.get(), "FAQs synced. Created FAQs: ")
+
+
+class SnappyCSVUploadTest(TestCase):
+    fixtures = ["test_snappyuploader.json"]
+
+    @override_settings(CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+                       CELERY_ALWAYS_EAGER=True,
+                       BROKER_BACKEND='memory',)
+    def setUp(self):
+        super(SnappyCSVUploadTest, self).setUp()
+
+    def test_data_loaded(self):
+        faqs = SnappyFaq.objects.all()
+        self.assertEqual(len(faqs), 1)
+
+    @responses.activate
+    def test_upload_csv(self):
+        api_root = "https://app.besnappy.com/api/v1/account/12345"
+        snappy_topics_response = [
+            {
+                "id": 52,
+                "faq_id": 2222,
+                "topic": "Stuff",
+                "order": 0,
+                "created_at": "2014-01-08 02:15:05",
+                "updated_at": "2014-01-08 02:15:05",
+                "slug": "stuff"
+            },
+            {
+                "id": 240,
+                "faq_id": 2222,
+                "topic": "Nonsense",
+                "order": 0,
+                "created_at": "2014-01-08 02:15:09",
+                "updated_at": "2014-01-08 02:15:09",
+                "slug": "nonsense"
+            }
+        ]
+
+        responses.add(responses.GET,
+                      "%s/faqs/2222/topics" % api_root,
+                      json.dumps(snappy_topics_response),
+                      status=200, content_type='application/json')
+        csv_dict = {}
+        import_result = csv_importer.delay(csv_dict, 2222)
+
+        self.assertEqual(import_result.get(),
+                         "Topics found: 2")

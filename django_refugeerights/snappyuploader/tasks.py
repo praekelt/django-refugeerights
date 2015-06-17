@@ -56,6 +56,12 @@ class CSV_Importer(Task):
         imported = 0
         row = 0
         try:
+            # Get FAQ topics
+            topics = snappy_request(
+                "GET",
+                "account/%s/faqs/%s/topics" % (
+                    settings.SNAPPY_ACCOUNT_ID, faq_id, ))
+            return "Topics found: %s" % len(topics)
             # for line in poidata:
             #     row += 1
             #     if "Latitude" in line and "Longitude" in line:
@@ -86,7 +92,7 @@ class CSV_Importer(Task):
             #     else:
             #         l.info("Row <%s> missing point data, not imported" % row)
             # l.info("Imported <%s> locations" % str(imported))
-            return imported
+            # return imported
         except SoftTimeLimitExceeded:
             logger.error(
                 'Soft time limit exceed processing location import \
@@ -94,6 +100,7 @@ class CSV_Importer(Task):
                 exc_info=True)
 
 csv_importer = CSV_Importer()
+
 
 class Sync_FAQs(Task):
 
