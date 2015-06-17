@@ -11,6 +11,8 @@ urlpatterns = patterns(
         'locationfinder.views.locations_uploader',
         {'page_name': 'locations_uploader'},
         name="locations_uploader"),
+    url(r'^admin/snappyuploader/upload/', 'snappyuploader.views.csv_uploader',
+        {'page_name': 'csv_uploader'}, name="csv_uploader"),
     url(r'^contentstore/', include('contentstore.urls')),
     url(r'^subscription/', include('subscription.urls')),
     url(r'^api-auth/',
