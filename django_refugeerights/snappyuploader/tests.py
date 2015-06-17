@@ -30,7 +30,17 @@ class SnappyFaqSyncTest(TestCase):
                             "navigation": "{Nav}",
                             "created_at": "2013-11-16 19:14:17",
                             "updated_at": "2013-11-19 07:46:59",
-                            "order": 0}]
+                            "order": 0},
+                           {"id": 2223,
+                            "account_id": 12345,
+                            "title": "Refugee FAQ 2223",
+                            "url": "refugee-rights-2",
+                            "custom_theme": "",
+                            "culture": "en",
+                            "navigation": "{Nav}",
+                            "created_at": "2013-11-16 19:14:17",
+                            "updated_at": "2013-11-19 07:46:59",
+                            "order": 1}]
 
         responses.add(responses.GET,
                       "https://app.besnappy.com/api/v1/account/12345/faqs",
@@ -40,6 +50,7 @@ class SnappyFaqSyncTest(TestCase):
         sync_result = sync_faqs.delay()
 
         faqs = SnappyFaq.objects.all()
-        self.assertEqual(len(faqs), 2)
+        self.assertEqual(len(faqs), 3)
         self.assertEqual(sync_result.get(),
-                         "FAQs synced. Created FAQs: Refugee FAQ 2222\n")
+                         "FAQs synced. Created FAQs: Refugee FAQ 2222\n"
+                         "Refugee FAQ 2223\n")
