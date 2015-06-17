@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'locationfinder',
     'metricsdownloader',
     'subscription',
+    'snappyuploader',
 
 )
 
@@ -151,7 +152,8 @@ CELERY_ALWAYS_EAGER = False
 
 # Tell Celery where to find the tasks
 CELERY_IMPORTS = (
-    'locationfinder.tasks'
+    'locationfinder.tasks',
+    'snappyuploader.tasks'
 )
 
 CELERY_TASK_SERIALIZER = 'json'
