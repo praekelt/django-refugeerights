@@ -47,16 +47,10 @@ def add_snappy_topic(topic_title, faq_id):
 
 
 def is_valid_snappy_data(csv_entry):
-    is_valid = True
-    required_fields = ["lang", "topic", "question", "answer"]
-    for field in required_fields:
-        if not field in csv_entry:
-            is_valid = False
-            break
-        if csv_entry[field] == "":
-            is_valid = False
-            break
-    return is_valid
+    for field in ["lang", "topic", "question", "answer"]:
+        if not field in csv_entry or csv_entry[field] == "":
+            return False
+    return True
 
 
 def record_failure(csv_entry):
