@@ -3,7 +3,7 @@ from django.test.utils import override_settings
 import responses
 import json
 from .models import SnappyFaq
-from .tasks import sync_faqs, csv_importer, add_snappy_topic
+from .tasks import sync_faqs, csv_importer, add_snappy_topic, post_faq
 
 
 class SnappyFaqSyncTest(TestCase):
@@ -113,6 +113,32 @@ class SnappyCSVUploadTest(TestCase):
         topic_add_result = add_snappy_topic("Banana", 2222)
         self.assertEqual(topic_add_result["id"], 241)
         self.assertEqual(topic_add_result["topic"], "Other")
+
+    @responses.activate
+    def test_add_snappy_faq(self):
+        api_root = "https://app.besnappy.com/api/v1/account/12345"
+        snappy_questions_post_response = {
+            "account_id": 12345,
+            "question": "[en]Question?",
+            "answer": "Answer.",
+            "active": 1,
+            "updated_at": "2015-06-18 09:46:32",
+            "created_at": "2015-06-18 09:46:32",
+            "id": 1111,
+            "parsed_answer": "<p>Answer.<\/p>\ ",
+            "account": {
+                "id": 12345,
+            }
+        }
+        responses.add(responses.POST,
+                      "%s/faqs/2222/topics/52/questions" % api_root,
+                      json.dumps(snappy_questions_post_response),
+                      status=200, content_type='application/json')
+        data = {"question": "[en]Question?",
+                "answer": "Answer."}
+
+        question_add_result = post_faq.delay(52, 2222, data)
+        self.assertEqual(question_add_result.get(), "Uploaded FAQ 1111")
 
     @responses.activate
     def test_upload_good_csv(self):
