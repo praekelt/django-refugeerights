@@ -7,7 +7,7 @@ import requests
 
 from django.conf import settings
 
-from .models import SnappyFaq
+from .models import SnappyFaq, FailureLog
 
 import json
 
@@ -30,6 +30,40 @@ def snappy_request(method, endpoint, py_data=None):
             api_url, auth=auth, headers=headers, verify=False)
     response.raise_for_status()
     return response.json()
+
+
+def add_snappy_topic(topic_title, faq_id):
+    """
+    Function that makes a new Snappy topic via Api Post
+    """
+    data = {"topic": topic_title}
+    response = snappy_request(
+        "POST",
+        "account/%s/faqs/%s/topics" % (
+            settings.SNAPPY_ACCOUNT_ID, faq_id),
+        py_data=data)
+    # Set topic_id to new topic id
+    return response
+
+
+def is_valid_snappy_data(csv_entry):
+    is_valid = True
+    required_fields = ["lang", "topic", "question", "answer"]
+    for field in required_fields:
+        if not field in csv_entry:
+            is_valid = False
+            break
+        if csv_entry[field] == "":
+            is_valid = False
+            break
+    return is_valid
+
+
+def record_failure(csv_entry):
+    fl = FailureLog()
+    fl.csv_content = csv_entry
+    fl.save()
+    return "Failure recorded in DB."
 
 
 class Post_FAQ(Task):
@@ -75,7 +109,8 @@ class CSV_Importer(Task):
         l = self.get_logger(**kwargs)
 
         l.info("Processing new snappy FAQ import data")
-        imported = 0
+        faqs_added = 0
+        topics_added = 0
         failed_imports = 0
         try:
             # Get FAQ topics
@@ -90,35 +125,38 @@ class CSV_Importer(Task):
 
             # Upload the CSV entries line by line
             for csv_entry in csv_data:
-                topic_title = csv_entry["topic"]
-                if topic_title in topics_map:
-                    topic_id = topics_map[topic_title]
+                if is_valid_snappy_data(csv_entry):
+                    topic_title = "[%s]%s" % (csv_entry["lang"],
+                                              csv_entry["topic"])
+                    if topic_title in topics_map:
+                        topic_id = topics_map[topic_title]
+                    else:
+                        # Post new topic to snappy
+                        result = add_snappy_topic(topic_title, faq_id)
+                        topics_added += 1
+                        topic_id = result["id"]
+                        # Add new topic to topics_map
+                        topics_map[topic_title] = topic_id
+
+                    # Post new FAQ
+                    data = {"question": (csv_entry["lang"] + csv_entry["question"]),
+                            "answer": csv_entry["answer"]}
+                    try:
+                        post_faq.delay(topic_id, faq_id, data)
+                        faqs_added += 1
+                    except:
+                        logger.error('Failed to upload question: %s' % (
+                            csv_entry["question"]))
+                        failed_imports += 1
+                        # Record failure
+                        record_failure(csv_entry)
                 else:
-                    # Post new topic to snappy
-                    data = {"topic": topic_title}
-                    response = snappy_request(
-                        "POST",
-                        "account/%s/faqs/%s/topics" % (
-                            settings.SNAPPY_ACCOUNT_ID, faq_id),
-                        py_data=data)
-                    # Set topic_id to new topic id
-                    topic_id = response["id"]
-                    # Add new topic to topics_map
-                    topics_map[topic_title] = topic_id
-
-                # Post new FAQ
-                data = {"question": csv_entry["question"],
-                        "answer": csv_entry["answer"]}
-                try:
-                    post_faq.delay(topic_id, faq_id, data)
-                    imported += 1
-                except:
-                    logger.error('Failed to upload question: %s' % (
-                        csv_entry["question"]))
+                    # Record failure
                     failed_imports += 1
+                    record_failure(csv_entry)
 
-            return "FAQs added: %s. Failed uploads: %s" % (imported,
-                                                           failed_imports)
+            return "Topics added: %s. FAQs added: %s. Failed uploads: %s" % (
+                topics_added, faqs_added, failed_imports)
 
         except SoftTimeLimitExceeded:
             logger.error(
