@@ -119,7 +119,7 @@ class SnappyCSVUploadTest(TestCase):
         api_root = "https://app.besnappy.com/api/v1/account/12345"
         snappy_questions_post_response = {
             "account_id": 12345,
-            "question": "[en]Question?",
+            "question": "[en] Question?",
             "answer": "Answer.",
             "active": 1,
             "updated_at": "2015-06-18 09:46:32",
@@ -134,10 +134,14 @@ class SnappyCSVUploadTest(TestCase):
                       "%s/faqs/2222/topics/52/questions" % api_root,
                       json.dumps(snappy_questions_post_response),
                       status=200, content_type='application/json')
-        data = {"question": "[en]Question?",
-                "answer": "Answer."}
+        data = {"question": "[en] Question?",
+                "answer": "Answer."},
+        csv_entry = {"question": "[en] Question?",
+                     "answer": "Answer.",
+                     "lang": "en",
+                     "topic": "Other"}
 
-        question_add_result = post_faq.delay(52, 2222, data)
+        question_add_result = post_faq.delay(52, 2222, data, csv_entry)
         self.assertEqual(question_add_result.get(), "Uploaded FAQ 1111")
 
     @responses.activate
@@ -147,7 +151,7 @@ class SnappyCSVUploadTest(TestCase):
             {
                 "id": 52,
                 "faq_id": 2222,
-                "topic": "[en]Stuff",
+                "topic": "[en] Stuff",
                 "order": 0,
                 "created_at": "2014-01-08 02:15:05",
                 "updated_at": "2014-01-08 02:15:05",
@@ -156,7 +160,7 @@ class SnappyCSVUploadTest(TestCase):
             {
                 "id": 240,
                 "faq_id": 2222,
-                "topic": "[en]Nonsense",
+                "topic": "[en] Nonsense",
                 "order": 0,
                 "created_at": "2014-01-08 02:15:09",
                 "updated_at": "2014-01-08 02:15:09",
@@ -165,7 +169,7 @@ class SnappyCSVUploadTest(TestCase):
         ]
         snappy_topics_post_response = {
             "id": 241,
-            "topic": "[en]Other",
+            "topic": "[en] Other",
             "order": 0,
             "faq_id": 2222,
             "updated_at": "2015-06-18 09:44:00",
@@ -174,7 +178,7 @@ class SnappyCSVUploadTest(TestCase):
         }
         snappy_questions_post_response1 = {
             "account_id": 12345,
-            "question": "[en]what's up?",
+            "question": "[en] what's up?",
             "answer": "doc",
             "active": 1,
             "updated_at": "2015-06-18 09:46:32",
@@ -187,7 +191,7 @@ class SnappyCSVUploadTest(TestCase):
         }
         snappy_questions_post_response2 = {
             "account_id": 12345,
-            "question": "[en]who am I?",
+            "question": "[en] who am I?",
             "answer": "john doe",
             "active": 1,
             "updated_at": "2015-06-18 09:46:32",
@@ -222,7 +226,7 @@ class SnappyCSVUploadTest(TestCase):
         import_result = csv_importer.delay(csv_data, 2222)
 
         self.assertEqual(import_result.get(),
-                         "Topics added: 1. FAQs added: 2. Failed uploads: 0")
+                         "Topics added: 1. FAQs imported: 2.")
 
     @responses.activate
     def test_upload_bad_csv(self):
@@ -270,4 +274,4 @@ class SnappyCSVUploadTest(TestCase):
         import_result = csv_importer.delay(csv_data, 2222)
 
         self.assertEqual(import_result.get(),
-                         "Topics added: 0. FAQs added: 0. Failed uploads: 6")
+                         "Topics added: 0. FAQs imported: 0.")
