@@ -32,6 +32,28 @@ def snappy_request(method, endpoint, py_data=None):
     return response.json()
 
 
+class Post_FAQ(Task):
+
+    """
+    Task to add an FAQ entry to Snappy via Api post
+    """
+    name = "snappyuploader.tasks.post_faq"
+
+    def run(self, topic_id, faq_id, data, **kwargs):
+        """
+        Returns FAQ id of imported FAQ
+        """
+        response = snappy_request(
+            "POST",
+            "account/%s/faqs/%s/topics/%s/questions" % (
+                settings.SNAPPY_ACCOUNT_ID, faq_id, topic_id),
+            py_data=data)
+
+        return "Uploaded FAQ %s" % response["id"]
+
+post_faq = Post_FAQ()
+
+
 class CSV_Importer(Task):
 
     """
@@ -54,45 +76,50 @@ class CSV_Importer(Task):
 
         l.info("Processing new snappy FAQ import data")
         imported = 0
-        row = 0
+        failed_imports = 0
         try:
             # Get FAQ topics
-            topics = snappy_request(
+            snappy_topics_data = snappy_request(
                 "GET",
                 "account/%s/faqs/%s/topics" % (
                     settings.SNAPPY_ACCOUNT_ID, faq_id, ))
-            return "Topics found: %s" % len(topics)
-            # for line in poidata:
-            #     row += 1
-            #     if "Latitude" in line and "Longitude" in line:
-            #         if line["Longitude"] != "" and line["Latitude"] != "":
-            #             poi_point = Point(float(line["Longitude"]),
-            #                               float(line["Latitude"]))
-            #             # check if point exists
-            #             locations = Location.objects.filter(point=poi_point)
-            #             if locations.count() == 0:
-            #                 # make a Location
-            #                 location = Location()
-            #                 location.point = poi_point
-            #                 location.save()
-            #             else:
-            #                 # Grab the top of the stack
-            #                 location = locations[0]
-            #             # Create new point of interest with location
-            #             poi = PointOfInterest()
-            #             poi.location = location
-            #             poi.data = line
-            #             poi.save()
-            #             imported += 1
-            #             l.info("Imported: %s" % line["Clinic Name"])
-            #         else:
-            #             l.info(
-            #                 "Row <%s> has corrupted point data, "
-            #                 "not imported" % row)
-            #     else:
-            #         l.info("Row <%s> missing point data, not imported" % row)
-            # l.info("Imported <%s> locations" % str(imported))
-            # return imported
+            # Save the topics in a reusable dict {topic1: id1, topic2: id2,}
+            topics_map = {}
+            for snappy_topic_obj in snappy_topics_data:
+                topics_map[snappy_topic_obj["topic"]] = snappy_topic_obj["id"]
+
+            # Upload the CSV entries line by line
+            for csv_entry in csv_data:
+                topic_title = csv_entry["topic"]
+                if topic_title in topics_map:
+                    topic_id = topics_map[topic_title]
+                else:
+                    # Post new topic to snappy
+                    data = {"topic": topic_title}
+                    response = snappy_request(
+                        "POST",
+                        "account/%s/faqs/%s/topics" % (
+                            settings.SNAPPY_ACCOUNT_ID, faq_id),
+                        py_data=data)
+                    # Set topic_id to new topic id
+                    topic_id = response["id"]
+                    # Add new topic to topics_map
+                    topics_map[topic_title] = topic_id
+
+                # Post new FAQ
+                data = {"question": csv_entry["question"],
+                        "answer": csv_entry["answer"]}
+                try:
+                    post_faq.delay(topic_id, faq_id, data)
+                    imported += 1
+                except:
+                    logger.error('Failed to upload question: %s' % (
+                        csv_entry["question"]))
+                    failed_imports += 1
+
+            return "FAQs added: %s. Failed uploads: %s" % (imported,
+                                                           failed_imports)
+
         except SoftTimeLimitExceeded:
             logger.error(
                 'Soft time limit exceed processing location import \
