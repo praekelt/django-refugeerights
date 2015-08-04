@@ -98,6 +98,23 @@ class TestSubscription(AuthenticatedAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
+    def test_patch_subscription(self):
+        response = self.client.get('/subscription/subscription/',
+                                   {"to_addr": "+278888"},
+                                   content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        sub = response.data[0]
+        self.assertEqual(sub["active"], True)
+        patch_data = {"active": False}
+        patch = self.client.patch('/subscription/subscription/%s/' % sub["id"],
+                                  json.dumps(patch_data),
+                                  content_type='application/json')
+        self.assertEqual(patch.status_code, status.HTTP_200_OK)
+        self.assertEqual(patch.data["active"], False)
+        d = Subscription.objects.get(id=sub["id"])
+        self.assertEqual(d.active, False)
+
 
 class RecordingHandler(logging.Handler):
 
