@@ -12,3 +12,4 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
+    filter_fields = ('contact_key', 'to_addr', 'active', )

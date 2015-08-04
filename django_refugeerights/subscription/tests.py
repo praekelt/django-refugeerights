@@ -40,6 +40,14 @@ class AuthenticatedAPITestCase(APITestCase):
 
 class TestSubscription(AuthenticatedAPITestCase):
 
+    fixtures = ["test"]
+
+    def test_data_loaded(self):
+        messagesets = MessageSet.objects.all()
+        self.assertEqual(len(messagesets), 2)
+        subscriptions = Subscription.objects.all()
+        self.assertEqual(len(subscriptions), 3)
+
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase
@@ -76,6 +84,19 @@ class TestSubscription(AuthenticatedAPITestCase):
         self.assertEqual(d.messageset_id, 1)
         self.assertEqual(d.lang, "en_GB")
         self.assertEqual(d.schedule.id, self.schedule.id)
+
+    def test_get_unfiltered_subscription(self):
+        response = self.client.get('/subscription/subscription/',
+                                   content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+
+    def test_get_filtered_subscription(self):
+        response = self.client.get('/subscription/subscription/',
+                                   {"to_addr": "+278888"},
+                                   content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
 
 
 class RecordingHandler(logging.Handler):
@@ -117,15 +138,16 @@ class TestMessageQueueProcessor(TestCase):
         messagesets = MessageSet.objects.all()
         self.assertEqual(len(messagesets), 2)
         subscriptions = Subscription.objects.all()
-        self.assertEqual(len(subscriptions), 2)
+        self.assertEqual(len(subscriptions), 3)
 
     def test_multisend(self):
         schedule = 1
         result = process_message_queue.delay(schedule, self.sender)
-        self.assertEquals(result.get(), 2)
+        self.assertEquals(result.get(), 3)
         self.assertEquals(
             True,
-            self.check_logs("Metric: 'sum.sms.subscription.outbound' [sum] -> 2"))
+            self.check_logs(
+                "Metric: 'sum.sms.subscription.outbound' [sum] -> 3"))
 
     def test_multisend_none(self):
         schedule = 2
@@ -169,9 +191,9 @@ class TestMessageQueueProcessor(TestCase):
         self.assertTrue(result.successful())
         # Check another added and old still there
         all_subscription = Subscription.objects.all()
-        self.assertEquals(len(all_subscription), 3)
+        self.assertEquals(len(all_subscription), 4)
         # Check new subscription is for second
-        new_subscription = Subscription.objects.get(pk=3)
+        new_subscription = Subscription.objects.last()
         self.assertEquals(new_subscription.messageset_id, 2)
         self.assertEquals(new_subscription.to_addr, "+271234")
         # make sure the new sub is on a different schedule
@@ -191,7 +213,7 @@ class TestMessageQueueProcessor(TestCase):
         self.assertTrue(result.successful())
         # Check no new subscription added
         all_subscription = Subscription.objects.all()
-        self.assertEquals(len(all_subscription), 2)
+        self.assertEquals(len(all_subscription), 3)
         # Check old one now inactive and complete
         subscriber_updated = Subscription.objects.get(pk=2)
         self.assertEquals(subscriber_updated.completed, True)
