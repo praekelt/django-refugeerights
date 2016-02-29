@@ -11,10 +11,10 @@ the files need to formatted correctly, such as the example below. ::
   en,Appl. Results,Unsuccessful,"If a RRO rejects your application, you're not recognised as a refugee. You have 30 days to give a notice of appeal, otherwise you must document your stay in another way or leave SA. The reason for rejection affects your appeal. If your application. was fraudulent or abusive, the Standing Committee of Refugee Affairs will review it. You have 14 days to give them a written statement on why you disagree, at the RRO that issued the rejection letter. Ask a LHR counsellor for help."
 
 The first line must contain all the column headers in order to identify which
-column is which. Each following line is provides and entry for the given topic.
-In snappy topics belong to a particular FAQ. The above example would add a
+column is which. Each of the following lines provides and entry a topic.
+In Snappy, topics belong to a particular FAQ. The above example would add
 2 topics and 5 questions. For example if the FAQ name was *Step1: Applying for Asylum*,
-the following would produce the following structure:
+the example would produce the following structure:
   1. Step1: Applying for Asylum
 
     a. [en] When/where to apply
@@ -43,4 +43,4 @@ the following would produce the following structure:
 
 .. warning::
 
-   Make sure to surround any entries which contain commas in quotes (ie. "Testing, Testing, Testing.").
+   Make sure to surround any entries which contain commas with quotes (ie. "Testing, Testing, Testing.").
