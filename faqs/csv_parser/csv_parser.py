@@ -1,7 +1,7 @@
 import csv
 
 
-class CsvContentParser:
+class CsvContentParser(object):
     filename = ""
     locale = ""
     topic_map = {}
@@ -52,7 +52,7 @@ class CsvContentParser:
                     output_file.write("{0}\n".format(row.__str__()))
 
 
-class RowEntry:
+class RowEntry(object):
     locale = ""
     topic = ""
     question = ""
