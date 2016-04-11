@@ -2,11 +2,8 @@ import csv
 
 
 class CsvContentParser(object):
-    filename = ""
-    locale = ""
     topic_map = {}
     current_topic = ""
-    delimiter = ''
 
     def __init__(self, filename, locale, delimiter):
         if len(filename) < 1:
@@ -53,10 +50,6 @@ class CsvContentParser(object):
 
 
 class RowEntry(object):
-    locale = ""
-    topic = ""
-    question = ""
-    answer = ""
 
     def __init__(self, locale, topic, question, answer):
         self.locale = self.escape_string(locale)
