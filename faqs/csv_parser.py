@@ -1,4 +1,5 @@
 import csv
+import unicodedata
 
 
 class CsvContentParser(object):
@@ -59,9 +60,16 @@ class RowEntry(object):
 
     def __init__(self, locale, topic, question, answer):
         self.locale = locale
-        self.topic = topic
-        self.question = question
-        self.answer = answer
+        self.topic = closest_ascii(topic)
+        self.question = closest_ascii(question)
+        self.answer = closest_ascii(answer)
+
+
+def closest_ascii(s):
+    """ Convert a Unicode string to ASCII by decomposing Unicode characters
+        and then dropping the non-ASCII parts.
+        """
+    return unicodedata.normalize("NFKD", s).encode('ascii', errors='ignore')
 
 
 def main():
