@@ -2,8 +2,6 @@ import csv
 
 
 class CsvContentParser(object):
-    topic_map = {}
-    current_topic = ""
 
     def __init__(self, filename, locale, delimiter):
         if len(filename) < 1:
@@ -20,26 +18,32 @@ class CsvContentParser(object):
         self.delimiter = delimiter
 
     def parse(self):
+        topic_map = {
+            "__current__": None
+        }
+
         with open(self.filename, 'rb') as csvfile:
             reader = csv.reader(csvfile, delimiter=self.delimiter,
                                 quotechar='"')
             for row in reader:
-                self.handle_row(row)
+                self.handle_row(row, topic_map)
 
         return self
 
-    def handle_row(self, row):
+    def handle_row(self, row, topic_map):
         if len(row[0].strip()) > 0:
-            self.current_topic = row[2].strip()
-            self.topic_map[self.current_topic] = []
-            return
+            new_topic = row[2].strip()
+            topic_map[new_topic] = []
+            topic_map["__current__"] = new_topic
 
         if row[4] == 'Back' or row[7] == 'Back' or len(row[7].strip()) == 0:
             return
 
+        current_topic = topic_map["__current__"]
+        assert current_topic is not None
         entry = RowEntry(self.locale, row[6], row[10], row[14])
-
-        self.topic_map[self.current_topic].append(entry)
+        topic_map[current_topic].append(entry)
+        return
 
     def save(self, destination_file):
         with open(destination_file, 'w') as output_file:
