@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import permissions
 from subscription.serializers import SubscriptionSerializer
 from rest_framework.exceptions import ValidationError
+from contentstore.models import MessageSet
 from django.http import HttpResponse
 
 
@@ -32,7 +33,6 @@ class SwitchSubscriptionView(APIView):
             messageset_id = data['messageset_id']
         except KeyError:
             raise ValidationError("A messageset 'id' parameter is required.")
-        return HttpResponse(status=200)
         try:
             messageset = MessageSet.objects.filter(pk=messageset_id).exists()
         except KeyError:
