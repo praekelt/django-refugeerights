@@ -92,6 +92,11 @@ class TestSubscription(AuthenticatedAPITestCase):
                                     content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        d = Subscription.objects.update()
+        self.assertEqual(d.contact_key, "+278888")
+        self.assertEqual(d.messageset_id, 2)
+        self.assertEqual(d.active, False)
+
     def test_get_unfiltered_subscription(self):
         response = self.client.get('/subscription/subscription/',
                                    content_type='application/json')
