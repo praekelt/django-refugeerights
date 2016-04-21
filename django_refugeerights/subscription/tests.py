@@ -87,7 +87,8 @@ class TestSubscription(AuthenticatedAPITestCase):
 
     def test_switch_subscription(self):
         response = self.client.get('/subscription/switch_subscription/',
-                                   {"to_addr": "+278888"},
+                                   {"contact_key": "+278888",
+                                    "messageset_id": "2"},
                                    content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
