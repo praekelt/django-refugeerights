@@ -34,8 +34,9 @@ class SwitchSubscriptionView(APIView):
         except KeyError:
             raise ValidationError("A messageset 'id' parameter is required.")
 
-        messageset = MessageSet.objects.filter(pk=messageset_id).exists()
-        if messageset is not None:
+        messageset_exists = MessageSet.objects.filter(
+            pk=messageset_id).exists()
+        if not messageset_exists:
             raise ValidationError("A messageset 'id' doesn't exist")
 
         subscription = Subscription.objects.filter(
