@@ -39,6 +39,6 @@ class SwitchSubscriptionView(APIView):
         if not messageset_exists:
             raise ValidationError("A messageset 'id' doesn't exist")
 
-        subscription = Subscription.objects.filter(
+        Subscription.objects.filter(
             pk=contact_key, active=True, completed=False).update(active=False)
         return HttpResponse(status=200)
