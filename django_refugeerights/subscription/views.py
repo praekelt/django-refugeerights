@@ -41,6 +41,6 @@ class SwitchSubscriptionView(APIView):
 
         Subscription.objects.filter(
             pk=contact_key, active=True, completed=False).update(active=False)
-        Subscription.save(messageset_id=messageset_id,
+        Subscription.create(messageset_id=messageset_id,
                           messageset_exists=messageset_exists)
         return HttpResponse(status=200)
