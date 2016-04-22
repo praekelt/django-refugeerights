@@ -22,7 +22,9 @@ class CsvConverter(object):
 
         reader = csv.reader(
             csvfile, delimiter=self.delimiter, quotechar=self.quotechar)
-        for row in reader:
+        for i, row in enumerate(reader):
+            if i < 3:
+                continue  # skip first 3 rows
             self._handle_row(row, faqs, locale)
 
         del faqs["__current_faq__"]
@@ -43,15 +45,15 @@ class CsvConverter(object):
             faqs[current_faq] = {}
         faq = faqs[current_faq]
 
-        new_topic = row[2].strip()
+        if row[4] == 'Back' or row[7] == 'Back' or len(row[7].strip()) == 0:
+            return
+
+        new_topic = row[4].strip()
         if new_topic and new_topic != current_topic:
             current_topic = faqs["__current_topic__"] = new_topic
             faq[current_topic] = []
             return
         topic = faq[current_topic]
-
-        if row[4] == 'Back' or row[7] == 'Back' or len(row[7].strip()) == 0:
-            return
 
         entry = RowEntry(
             locale, self._decode(row[6]), self._decode(row[10]),
@@ -59,9 +61,9 @@ class CsvConverter(object):
         topic.append(entry)
         return
 
-    def save(self, refugee_type, locale, faqs):
+    def save(self, category, faqs):
         for faq in sorted(faqs.keys()):
-            output_file = os.path.join(refugee_type, locale, "%s.csv" % faq)
+            output_file = os.path.join(category, "%s.csv" % faq)
             with open(output_file, "wb") as f:
                 writer = csv.writer(f)
                 writer.writerow(['locale', 'topic', 'question', 'answer'])
@@ -88,17 +90,48 @@ def closest_ascii(s):
     return unicodedata.normalize("NFKD", s).encode('ascii', errors='ignore')
 
 
+def deep_merge_faqs(a, b):
+    """ Merges FAQ dict b into dict a, combining sub-dictionaries as needed.
+    """
+    for k in b:
+        b_v = b.get(k)
+        a_v = a.get(k)
+        if isinstance(a_v, dict) and isinstance(b_v, dict):
+            deep_merge_faqs(a_v, b_v)
+        elif isinstance(a_v, list) and isinstance(b_v, list):
+            a_v.extend(b_v)
+        elif a_v is None and isinstance(b_v, (dict, list)):
+            a[k] = b_v
+        else:
+            raise ValueError("Unexpected FAQ values: %r, %r" % (a_v, b_v))
+
+
 def main():
-    if len(sys.argv) != 3:
-        print(
-            "Usage: %s <refugee-or-migrant> <locale>" % sys.argv[0])
+    input_files = sys.argv[1:]
+    if not input_files:
+        print ("Usage: %s src/refugee/fr.csv src/refugee/so.csv ..."
+               % sys.argv[0])
         return 1
-    [refugee_type, locale] = sys.argv[1:]
+
     converter = CsvConverter()
-    input_file = os.path.join("src", refugee_type, "%s.csv" % locale)
-    with open(input_file, "rb") as f:
-        faqs = converter.parse(f, locale)
-    converter.save(refugee_type, locale, faqs)
+    all_faqs = {}
+    categories = set()
+
+    for input_file in input_files:
+        category, csv_file = input_file.split(os.path.sep)[-2:]
+        assert csv_file.endswith(".csv")
+        locale = csv_file[:-len(".csv")]
+        print "Parsing %ss (%s) ..." % (category, locale)
+        categories.add(category)
+        with open(input_file, "rb") as f:
+            faqs = converter.parse(f, locale)
+            deep_merge_faqs(all_faqs, faqs)
+
+    if len(categories) != 1:
+        print "Multiple categories (%r) given! Aborting." % (categories,)
+        return 1
+
+    converter.save(category, all_faqs)
 
 
 if __name__ == "__main__":
