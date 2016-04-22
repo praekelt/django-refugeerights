@@ -66,7 +66,7 @@ class CsvConverter(object):
             output_file = os.path.join(category, "%s.csv" % faq)
             with open(output_file, "wb") as f:
                 writer = csv.writer(f)
-                writer.writerow(['locale', 'topic', 'question', 'answer'])
+                writer.writerow(['lang', 'topic', 'question', 'answer'])
                 topics = faqs[faq]
                 for topic in sorted(topics.keys()):
                     for row in topics[topic]:
