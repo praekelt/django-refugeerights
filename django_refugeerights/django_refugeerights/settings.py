@@ -19,7 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = 'ytreureuyryru'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = None
@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'django_refugeerights.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgis://postgres:@localhost/django_refugeerights'),
+        default='postgis://trevisto:trevisto@localhost/refugeedb1'),
 }
 
 # django.contrib.gis.db.backends.postgis

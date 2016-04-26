@@ -86,15 +86,15 @@ class TestSubscription(AuthenticatedAPITestCase):
         self.assertEqual(d.schedule.id, self.schedule.id)
 
     def test_switch_subscription(self):
+        post_data = {
+            'contact_key': '+277666',
+            'messageset_id': '1'
+        }
         response = self.client.post('/subscription/switch_subscription/',
-                                    {"contact_key": "+278888",
-                                     "messageset_id": "2"},
+                                    json.dumps(post_data),
                                     content_type='application/json')
+        print response
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        d = Subscription.objects.update()
-        self.assertEqual(d.messageset_id, 2)
-        self.assertEqual(d.active, False)
 
     def test_get_unfiltered_subscription(self):
         response = self.client.get('/subscription/subscription/',
