@@ -110,6 +110,24 @@ class TestSubscription(AuthenticatedAPITestCase):
             contact_key='82309423098',
             active=True, completed=False).count(), 1)
 
+    def test_bad_request(self):
+        post_data = {
+            'messageset_id': '1',
+            'schedule': self.schedule.id
+        }
+
+        self.assertEqual(Subscription.objects.all().count(), 3)
+        self.assertEqual(Subscription.objects.filter(active=True).count(), 3)
+
+        json_response = self.client.post('/subscription/switch_subscription/',
+                                         json.dumps(post_data),
+                                         content_type='application/json')
+        self.assertEqual(json_response.status_code,
+                         status.HTTP_400_BAD_REQUEST)
+
+        self.assertEqual(Subscription.objects.all().count(), 3)
+        self.assertEqual(Subscription.objects.filter(active=True).count(), 3)
+
     def test_get_unfiltered_subscription(self):
         response = self.client.get('/subscription/subscription/',
                                    content_type='application/json')
