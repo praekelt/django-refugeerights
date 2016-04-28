@@ -94,7 +94,6 @@ class TestSubscription(AuthenticatedAPITestCase):
         response = self.client.post('/subscription/switch_subscription/',
                                     json.dumps(post_data),
                                     content_type='application/json')
-        print response
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         d = Subscription.objects.last()
