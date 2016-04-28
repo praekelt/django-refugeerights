@@ -7,6 +7,8 @@ from subscription.serializers import SubscriptionSerializer
 from rest_framework.exceptions import ValidationError
 from contentstore.models import MessageSet
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from djcelery.models import PeriodicTask
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
@@ -34,14 +36,24 @@ class SwitchSubscriptionView(APIView):
         except KeyError:
             raise ValidationError("A messageset 'id' parameter is required.")
 
+        try:
+            schedule_id = data['schedule']
+        except KeyError:
+            raise ValidationError(
+                "A messageset 'schedule' parameter is required.")
+
         messageset_exists = MessageSet.objects.filter(
             pk=messageset_id).exists()
         if not messageset_exists:
             raise ValidationError("A messageset 'id' doesn't exist")
 
+        schedule = get_object_or_404(PeriodicTask, id=int(schedule_id))
+
         Subscription.objects.filter(
-            pk=contact_key, active=True, completed=False).update(active=False)
+            contact_key=contact_key,
+            active=True, completed=False).update(active=False)
+
         Subscription.objects.create(messageset_id=messageset_id,
-                                    contact_key=contact_key)
-        Subscription.save()
+                                    contact_key=contact_key,
+                                    schedule=schedule)
         return HttpResponse(status=200)
