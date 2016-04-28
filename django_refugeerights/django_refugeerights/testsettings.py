@@ -2,7 +2,7 @@ from django_refugeerights.settings import *  # flake8: noqa
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgis://trevisto:trevistor@localhost/refugeedb_test'),
+        default='postgis://postgres:@localhost/django_refugeerights'),
 }
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -27,3 +27,9 @@ VUMI_GO_ACCOUNT_TOKEN = 'conv-token'
 
 SNAPPY_ACCOUNT_ID = 12345
 SNAPPY_API_KEY = "testkey"
+
+
+try:
+    from local_settings import *   # flake8: noqa
+except ImportError:
+    pass
