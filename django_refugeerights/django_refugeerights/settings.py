@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'django_refugeerights.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgis://trevisto:trevisto@localhost/refugeedb1'),
+        default='postgis://postgres:@localhost/django_refugeerights'),
 }
 
 # django.contrib.gis.db.backends.postgis
