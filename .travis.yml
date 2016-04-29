@@ -19,3 +19,4 @@ before_script:
 # command to run tests, e.g. python setup.py test
 script:
   - ./django_refugeerights/runtests.sh
+  - py.test faqs
