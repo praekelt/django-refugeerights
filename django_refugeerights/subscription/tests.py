@@ -122,8 +122,8 @@ class TestSubscription(AuthenticatedAPITestCase):
         json_response = self.client.post('/subscription/switch_subscription/',
                                          json.dumps(post_data),
                                          content_type='application/json')
-        self.assertEqual(json_response.status_code,
-                         status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(json_response.data,
+                         [u"A contact 'key' parameter is required."])
 
         self.assertEqual(Subscription.objects.all().count(), 3)
         self.assertEqual(Subscription.objects.filter(active=True).count(), 3)
