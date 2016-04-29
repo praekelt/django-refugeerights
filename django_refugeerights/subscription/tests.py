@@ -85,6 +85,49 @@ class TestSubscription(AuthenticatedAPITestCase):
         self.assertEqual(d.lang, "en_GB")
         self.assertEqual(d.schedule.id, self.schedule.id)
 
+    def test_switch_subscription(self):
+        post_data = {
+            'contact_key': '82309423098',
+            'messageset_id': '1',
+            'schedule': self.schedule.id
+        }
+
+        self.assertEqual(Subscription.objects.filter(
+            contact_key='82309423098',
+            active=True, completed=False).count(), 3)
+
+        response = self.client.post('/subscription/switch_subscription/',
+                                    json.dumps(post_data),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        d = Subscription.objects.last()
+        self.assertEqual(d.contact_key, "82309423098")
+        self.assertEqual(d.messageset_id, 1)
+        self.assertEqual(d.schedule.id, self.schedule.id)
+
+        self.assertEqual(Subscription.objects.filter(
+            contact_key='82309423098',
+            active=True, completed=False).count(), 1)
+
+    def test_bad_request(self):
+        post_data = {
+            'messageset_id': '1',
+            'schedule': self.schedule.id
+        }
+
+        self.assertEqual(Subscription.objects.all().count(), 3)
+        self.assertEqual(Subscription.objects.filter(active=True).count(), 3)
+
+        json_response = self.client.post('/subscription/switch_subscription/',
+                                         json.dumps(post_data),
+                                         content_type='application/json')
+        self.assertEqual(json_response.data,
+                         [u"A contact 'key' parameter is required."])
+
+        self.assertEqual(Subscription.objects.all().count(), 3)
+        self.assertEqual(Subscription.objects.filter(active=True).count(), 3)
+
     def test_get_unfiltered_subscription(self):
         response = self.client.get('/subscription/subscription/',
                                    content_type='application/json')

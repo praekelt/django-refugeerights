@@ -27,3 +27,9 @@ VUMI_GO_ACCOUNT_TOKEN = 'conv-token'
 
 SNAPPY_ACCOUNT_ID = 12345
 SNAPPY_API_KEY = "testkey"
+
+
+try:
+    from local_settings import *   # flake8: noqa
+except ImportError:
+    pass

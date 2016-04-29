@@ -9,4 +9,5 @@ router.register(r'subscription', views.SubscriptionViewSet)
 # Additionally, we include login URLs for the browseable API.
 urlpatterns = [
     url(r'^', include(router.urls)),
+    url(r'switch_subscription/', views.SwitchSubscriptionView.as_view()),
 ]
